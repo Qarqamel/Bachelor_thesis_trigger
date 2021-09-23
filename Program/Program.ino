@@ -16,17 +16,14 @@ void setup() {
   Serial.setTimeout(-1);
 
   pinMode(2, INPUT);
-  attachInterrupt(digitalPinToInterrupt(2), Interrupt_routine, RISING);
   }
 
 void loop() {
   Serial.readStringUntil('\n');
-
-  detachInterrupt(digitalPinToInterrupt(2));
+  attachInterrupt(digitalPinToInterrupt(2), Interrupt_routine, RISING);
   
   for(unsigned int i = 0; i < SAMPLE_NR; i++){
     Serial.println(times[i]);
   }
   times_iter = 0;
-  attachInterrupt(digitalPinToInterrupt(2), Interrupt_routine, RISING);
 }
