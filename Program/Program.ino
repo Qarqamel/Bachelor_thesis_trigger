@@ -20,10 +20,10 @@ void setup() {
 
 void loop() {
   Serial.readStringUntil('\n');
+  times_iter = 0;
   attachInterrupt(digitalPinToInterrupt(2), Interrupt_routine, RISING);
   
   for(unsigned int i = 0; i < SAMPLE_NR; i++){
     Serial.println(times[i]);
   }
-  times_iter = 0;
 }
