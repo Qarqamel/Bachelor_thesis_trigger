@@ -5,7 +5,6 @@ unsigned int captured_time_prev;
 unsigned int tbl_iter = 0;
 
 ISR(TIMER1_CAPT_vect){
-  //TCNT1 = 0;
   captured_times[tbl_iter++] = ICR1 - captured_time_prev;
   captured_time_prev = ICR1;
   if(tbl_iter == SAMPLE_NR)
