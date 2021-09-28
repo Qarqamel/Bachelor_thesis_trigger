@@ -3,8 +3,8 @@
 #define ENABLE_INPUT_CAPTURE() (TIMSK1 |= (1<<ICIE1))
 #define DISABLE_INPUT_CAPTURE() (TIMSK1 &= ~(1<<ICIE1))
 
-unsigned int captured_times[SAMPLE_NR];
-unsigned int captured_time_prev;
+uint16_t captured_times[SAMPLE_NR];
+uint16_t captured_time_prev;
 unsigned int sample_ctr = 0;
 volatile bool acquisition_complete = false;
 
