@@ -9,7 +9,7 @@ unsigned int sample_ctr = 0;
 volatile bool acquisition_complete = false;
 
 ISR(TIMER1_CAPT_vect){
-  captured_times[sample_ctr++] = ICR1 - captured_time_prev;
+  captured_times[sample_ctr++] = ICR1 - captured_time_prev; //poniewaz int an ATMEGA ma 16bitów - nie jest konieczna obsługa przekręcania licznika timera
   captured_time_prev = ICR1;
   if(sample_ctr == SAMPLE_NR){
     DISABLE_INPUT_CAPTURE();
