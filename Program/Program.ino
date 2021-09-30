@@ -1,3 +1,16 @@
+//METER_ADVANCED_CAPTURE
+//
+//Mierzy czas(1/2us) od resetu na zboczach PWM-a wejściowego SAMPLE_NR razy i wysyła wyniki przez UART.
+//Pomiar rozpoczyna się po odebraniu na UART-cie dowolnej wiadomości zakończonej terminatorem ('\n').
+//Okres wejściowy: 0-32767us
+//
+//INPUT: 8-PB0(Uno), 4-PD4(Leonardo)
+//OUTPUT: -
+//
+//Program korzysta z funkcji input capture 16-bitowego timera (timer1). Timer działa w trybie CTC z preskalerem ustawionym na 8.
+//Po otrzymaniu terminatora na UART-cie program rozpoczyna pomiar, na zboczach rosnących przebiegu wejściowego wpisując czas od resetu do tablicy wyników. 
+//Po wypełnieniu wysyła tablicę wyników przez UART.
+
 #define SAMPLE_NR 400
 
 #define ENABLE_INPUT_CAPTURE() (TIMSK1 |= (1<<ICIE1))
