@@ -13,17 +13,23 @@
 //Po wypełnieniu wysyła tablicę wyników przez UART.
 
 #define SAMPLE_NR 2900
-
 #define ENABLE_INPUT_CAPTURE() (TIMSK4 |= (1<<ICIE4))
 #define DISABLE_INPUT_CAPTURE() (TIMSK4 &= ~(1<<ICIE4))
 
 volatile unsigned int Periods[SAMPLE_NR];
 volatile unsigned int Period_prev;
-volatile unsigned int edge_ctr = 0;
-volatile bool acquisition_complete = false;
-volatile bool first_acq = false;
+
+volatile unsigned int edge_ctr;
+volatile bool acquisition_complete;
+volatile bool first_acq;
 
 ISR(TIMER4_CAPT_vect){
+
+  if(first_acq){
+    Period_prev = ICR4;
+    first_acq = false;
+    return;
+  }
   Periods[edge_ctr++] = ICR4 - Period_prev;
   Period_prev = ICR4;
   if(first_acq){
@@ -56,8 +62,9 @@ void setup() {
 void loop() {
 
   Serial.readStringUntil('\n');
-  edge_ctr=0;
+
   acquisition_complete=false;
+  edge_ctr=0;
   first_acq = true;
   ENABLE_INPUT_CAPTURE();
 
