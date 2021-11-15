@@ -1,4 +1,4 @@
-from my_serial import my_serial_9600,read,read_byte,writeln
+from my_serial import my_serial_9600,read_byte,writeln
 
 TB_COM_NR = 6
 
