@@ -16,7 +16,7 @@ volatile unsigned long Sample_ctr = 0;
 volatile byte sample_val = 0;
 
 void OnChange_Timebase(){
-  Serial.print(sample_val);
+  Serial1.print(sample_val);
   Sample_ctr++;
   if(sample_val == 1){
     sample_val = 0;
@@ -27,28 +27,27 @@ void OnChange_Timebase(){
 void setup() {
   pinMode(TIMEBASE_PIN, INPUT_PULLUP);
 
-  Serial.begin(115200);
-  Serial.setTimeout(-1);
   Serial1.begin(115200);
   Serial1.setTimeout(-1);
+  Serial.begin(115200);
+  Serial.setTimeout(-1);  
 
   Serial.println("Started");
-  Serial1.println("Started");
+  //Serial1.println("Started");
   
-  Serial1.readStringUntil('\n');
+  Serial.readStringUntil('\n');
 
   StartupSynchronization();
   attachInterrupt(digitalPinToInterrupt(TIMEBASE_PIN), OnChange_Timebase, RISING);
-}
-
-void loop() {
-  Serial1.readStringUntil('\n');
   for(byte i = 0; i<PULSES_NR_PER_ACQ; i++){
     sample_val = 1;
-    Serial.readStringUntil('\n');
+    Serial1.readStringUntil('\n');
     Delays_tbl[i] = Sample_ctr;
   }
   for(byte i = 0; i<PULSES_NR_PER_ACQ; i++){
-    Serial1.println(Delays_tbl[i]);
+    Serial.println(Delays_tbl[i]);
   }
+}
+
+void loop() {
 }
