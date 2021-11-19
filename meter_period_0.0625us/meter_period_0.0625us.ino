@@ -20,26 +20,28 @@
 #define ENABLE_INPUT_CAPTURE() (TIMSK4 |= (1<<ICIE4))
 #define DISABLE_INPUT_CAPTURE() (TIMSK4 &= ~(1<<ICIE4))
 
+void StartupSynchronization(){
+  pinMode(WAIT_TO_START_PIN, INPUT_PULLUP);
+  pinMode(STARTED_PIN, INPUT_PULLUP);
+  while(digitalRead(WAIT_TO_START_PIN)){}
+  pinMode(STARTED_PIN, OUTPUT);
+  digitalWrite(STARTED_PIN, 0);
+}
+
+void TimerConfig(){
+  //ICES - input capture edge select to rising, CS - setting prescaler to 1
+  //WGM - setting waveform generation mode to 0
+  TCCR4B |= (1<<ICES4)|(1<<CS40);
+  TCCR4B &= ~((1<<ICNC4)|(1<<WGM43)|(1<<WGM42)|(1<<CS42)|(1<<CS41));
+  TCCR4A &= ~((1<<COM4A1)|(1<<COM4A0)|(1<<COM4B1)|(1<<COM4B0)|(1<<COM4C1)|(1<<COM4C0)|(1<<WGM41)|(1<<WGM40));  
+}
+
 volatile unsigned int Periods[SAMPLE_NR];
 volatile unsigned int Period_prev;
 
 volatile unsigned int edge_ctr;
 volatile bool acquisition_complete;
 volatile bool first_acq;
-
-void StartupSynchronization_Init(){
-  pinMode(WAIT_TO_START_PIN, INPUT_PULLUP);
-  pinMode(STARTED_PIN, INPUT_PULLUP);
-}
-
-void StartupSynchronization_Wait(){
-  while(digitalRead(WAIT_TO_START_PIN)){}
-}
-
-void StartupSynchronization_Start(){
-  pinMode(STARTED_PIN, OUTPUT);
-  digitalWrite(STARTED_PIN, 0);
-}
 
 ISR(TIMER4_CAPT_vect){
 
@@ -57,27 +59,19 @@ ISR(TIMER4_CAPT_vect){
 }
 
 void setup() {
-
   pinMode(TIMEBASE_PIN, INPUT_PULLUP); //ICP1 pin - input capture pin. pin 4 - PD4 for Leonardo; pin 8 - PB0 for Uno;ICP4 pin 49 - PL1 for Mega
-  StartupSynchronization_Init();
   
   Serial.begin(115200);
   Serial.setTimeout(-1);
   Serial.println("Started");
 
-  StartupSynchronization_Wait();  
-  
-  //ICES - input capture edge select to rising, CS - setting prescaler to 1
-  //WGM - setting waveform generation mode to 0
-  TCCR4B |= (1<<ICES4)|(1<<CS40);
-  TCCR4B &= ~((1<<ICNC4)|(1<<WGM43)|(1<<WGM42)|(1<<CS42)|(1<<CS41));
-  TCCR4A &= ~((1<<COM4A1)|(1<<COM4A0)|(1<<COM4B1)|(1<<COM4B0)|(1<<COM4C1)|(1<<COM4C0)|(1<<WGM41)|(1<<WGM40));  
+  Serial.readStringUntil('\n');
+
+  TimerConfig();
+  StartupSynchronization();
 }
 
 void loop() {
-  Serial.readStringUntil('\n');
-  StartupSynchronization_Start();
-
   acquisition_complete=false;
   edge_ctr=0;
   first_acq = true;
@@ -88,4 +82,5 @@ void loop() {
   for(unsigned int i=0; i<SAMPLE_NR; i++){
     Serial.println(Periods[i]);
   }
+  Serial.readStringUntil('\n');
 }
