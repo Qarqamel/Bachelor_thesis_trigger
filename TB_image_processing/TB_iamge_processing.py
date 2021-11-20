@@ -18,7 +18,11 @@ with my_serial(GENERATOR_COM_NR) as sr_generator:
         
         writeln(sr_tester, 'Start_acquisition')
         
-        delays = [int(read(sr_tester)) for i in range(PULSES_NR)]
+        delays = []
+        for i in range(PULSES_NR):
+            writeln(sr_tester, 0b1)
+            delays.append(int(read(sr_tester)))
+        # writeln(sr_tester, 0b10)
                 
 df = pd.DataFrame()
 df['Delays [ms]'] = delays

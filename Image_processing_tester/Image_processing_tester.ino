@@ -11,7 +11,6 @@ void StartupSynchronization(){
   digitalWrite(STARTED_PIN, 0);
 }
 
-unsigned long Delays_tbl[PULSES_NR_PER_ACQ];
 volatile unsigned long Sample_ctr = 0;
 volatile byte sample_val = 0;
 
@@ -33,21 +32,15 @@ void setup() {
   Serial.setTimeout(-1);  
 
   Serial.println("Started");
-  //Serial1.println("Started");
   
   Serial.readStringUntil('\n');
 
   StartupSynchronization();
   attachInterrupt(digitalPinToInterrupt(TIMEBASE_PIN), OnChange_Timebase, RISING);
-  for(byte i = 0; i<PULSES_NR_PER_ACQ; i++){
-    sample_val = 1;
-    Serial1.readStringUntil('\n');
-    Delays_tbl[i] = Sample_ctr;
-  }
-  for(byte i = 0; i<PULSES_NR_PER_ACQ; i++){
-    Serial.println(Delays_tbl[i]);
-  }
 }
 
 void loop() {
+  Serial.readBytes(sample_val, 1);
+  Serial1.readStringUntil('\n');
+  Serial.println(Sample_ctr);
 }
