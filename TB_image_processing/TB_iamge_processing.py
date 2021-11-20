@@ -1,4 +1,4 @@
-from my_serial import my_serial,read,writeln
+from my_serial import my_serial,read,writeln,write
 import shutil, os
 import pandas as pd
 from tabulate import tabulate
@@ -8,6 +8,10 @@ GENERATOR_COM_NR = 7
 
 PULSES_NR = 100
 
+with my_serial(TESTER_COM_NR) as sr_tester: 
+    read(sr_tester)
+    writeln(sr_tester, 'Start')
+
 with my_serial(GENERATOR_COM_NR) as sr_generator:    
     with my_serial(TESTER_COM_NR) as sr_tester:        
         read(sr_tester)     
@@ -16,15 +20,16 @@ with my_serial(GENERATOR_COM_NR) as sr_generator:
         writeln(sr_generator, '1')
         writeln(sr_tester, 'Start')
         
-        writeln(sr_tester, 'Start_acquisition')
-        
         delays = []
+        timestamps = []
         for i in range(PULSES_NR):
-            writeln(sr_tester, 0b1)
+            writeln(sr_tester, str(0b1))
+            timestamps.append(int(read(sr_tester)))
             delays.append(int(read(sr_tester)))
-        # writeln(sr_tester, 0b10)
+        writeln(sr_tester, str(0b10))
                 
 df = pd.DataFrame()
+df['Timestamps'] = timestamps
 df['Delays [ms]'] = delays
 
 result = tabulate(df, df.columns)
