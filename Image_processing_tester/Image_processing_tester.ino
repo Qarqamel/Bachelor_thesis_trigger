@@ -17,7 +17,7 @@ volatile byte sample_val = 0;
 void OnChange_Timebase(){
   Serial1.print(sample_val);
   Sample_ctr++;
-  if(sample_val == 1){
+  if(sample_val >= 1){
     sample_val = 0;
     Sample_ctr = 0;
   }    
@@ -29,10 +29,9 @@ void setup() {
   Serial1.begin(115200);
   Serial1.setTimeout(-1);
   Serial.begin(115200);
-  Serial.setTimeout(-1);  
-
-  Serial.println("Started");
+  Serial.setTimeout(-1);
   
+  Serial.println("Started");
   Serial.readStringUntil('\n');
 
   StartupSynchronization();
@@ -40,7 +39,7 @@ void setup() {
 }
 
 void loop() {
-  Serial.readBytes(sample_val, 1);
-  Serial1.readStringUntil('\n');
+  sample_val = Serial.readStringUntil('\n').toInt();
+  Serial.println(Serial1.readStringUntil('\n'));
   Serial.println(Sample_ctr);
 }
