@@ -1,7 +1,10 @@
 //PROGRAMMABLE_PULSE_GENERATOR
 
+#define SR_SYNC 1
+
 #define PULSE_TIME_BASE_PIN 2
 #define SIGNAL_PIN 5
+#define FINISHED_PIN 6
 #define WAIT_TO_START_PIN 11
 #define STARTED_PIN 13
 
@@ -33,6 +36,7 @@ void OnChange_PulseTimebase(){
     if(pulse_ctr == (PULSES_NR*2)){
       detachInterrupt(digitalPinToInterrupt(PULSE_TIME_BASE_PIN));
       digitalWrite(STARTED_PIN, LOW);
+      digitalWrite(FINISHED_PIN, HIGH);
     }
     digitalWrite(SIGNAL_PIN, pulse_ctr%2);
   }  
@@ -40,6 +44,7 @@ void OnChange_PulseTimebase(){
 
 void setup() {
   pinMode(SIGNAL_PIN, OUTPUT);
+  pinMode(FINISHED_PIN, OUTPUT);
   pinMode(PULSE_TIME_BASE_PIN, INPUT_PULLUP);
   
   Serial.begin(115200);
@@ -59,8 +64,13 @@ void setup() {
     Pulses[(2*i)+1] = sPulses[i].width;
   }
 
-  StartupSynchronization();
+  if (!SR_SYNC){
+    StartupSynchronization();
+  }
   attachInterrupt(digitalPinToInterrupt(PULSE_TIME_BASE_PIN), OnChange_PulseTimebase, RISING);
+  if (SR_SYNC){
+    Serial.println("Started");
+  }
 }
 
 void loop() {

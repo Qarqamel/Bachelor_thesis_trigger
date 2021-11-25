@@ -10,6 +10,8 @@
 //Przy użyciu 16-bitowego timera (timer1) pracującego w trybie non inverting fast PWM z prescalerem 64, generuje przebieg prostkątny. 
 //Okres przebiegu przyjmowany jest przez UART-a, następnie zwracany spowrotem i wpisywany do rejestru Output compare timera, w celu zmiany okresu przebiego.
 
+#define SR_SYNC 1
+
 #define WAIT_TO_START_PIN 11
 #define STARTED_PIN 13
 
@@ -43,8 +45,13 @@ void setup() {
   unsigned int T_ms = Serial.readStringUntil('\n').toInt();
 
   TimerConfig(T_ms);
-  StartupSynchronization();
+  if(!SR_SYNC){
+    StartupSynchronization();
+  }
   TimerStart();
+  if (SR_SYNC){
+    Serial.println("Started");
+  }
 }
 
 void loop() {

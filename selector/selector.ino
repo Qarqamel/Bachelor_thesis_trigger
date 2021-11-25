@@ -10,6 +10,8 @@
 //Jeśli tak, to usuwa je z tablicy i zwraca informację przez UART.
 //#include <arduino-timer.h>
 
+#define SR_SYNC                   1
+
 #define MAX_TSTAMP_NR             10
 
 #define WAIT_TO_START_PIN         11
@@ -50,10 +52,15 @@ void setup() {
   
   Serial.begin(115200); 
   Serial.setTimeout(0);
-  Serial.println("Started");
+  Serial.println("Init");
 
-  StartupSynchronization();    
+  if (!SR_SYNC){
+    StartupSynchronization();
+  }   
   attachInterrupt(digitalPinToInterrupt(TIMEBASE_PIN), OnChange_Timebase, RISING);
+  if (SR_SYNC){
+    Serial.println("Started");
+  }
 }
 
 
