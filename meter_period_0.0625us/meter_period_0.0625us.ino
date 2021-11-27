@@ -13,20 +13,10 @@
 //Po wypełnieniu wysyła tablicę wyników przez UART.
 
 #define TIMEBASE_PIN 49
-#define WAIT_TO_START_PIN 11
-#define STARTED_PIN 13
 
 #define SAMPLE_NR 2900
 #define ENABLE_INPUT_CAPTURE() (TIMSK4 |= (1<<ICIE4))
 #define DISABLE_INPUT_CAPTURE() (TIMSK4 &= ~(1<<ICIE4))
-
-void StartupSynchronization(){
-  pinMode(WAIT_TO_START_PIN, INPUT_PULLUP);
-  pinMode(STARTED_PIN, INPUT_PULLUP);
-  while(digitalRead(WAIT_TO_START_PIN)){}
-  pinMode(STARTED_PIN, OUTPUT);
-  digitalWrite(STARTED_PIN, 0);
-}
 
 void TimerConfig(){
   //ICES - input capture edge select to rising, CS - setting prescaler to 1
@@ -63,15 +53,14 @@ void setup() {
   
   Serial.begin(115200);
   Serial.setTimeout(-1);
-  Serial.println("Started");
-
-  Serial.readStringUntil('\n');
+  Serial.println("COM opened");
 
   TimerConfig();
-  StartupSynchronization();
+  Serial.println("Started;Waiting for acq");
 }
 
 void loop() {
+  Serial.readStringUntil('\n');
   acquisition_complete=false;
   edge_ctr=0;
   first_acq = true;
@@ -82,5 +71,4 @@ void loop() {
   for(unsigned int i=0; i<SAMPLE_NR; i++){
     Serial.println(Periods[i]);
   }
-  Serial.readStringUntil('\n');
 }

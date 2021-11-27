@@ -1,12 +1,16 @@
-from my_serial import my_serial,read,read_byte,writeln
-import shutil, os, random
+import shutil, os, random, sys
 from matplotlib import pyplot as plt
 import numpy as np
 from tabulate import tabulate
+sys.path.append('../')
+from my_serial import my_serial,read,read_byte,writeln
 
-PERIOD_GEN_COM_NR = 19
-PULSE_GEN_COM_NR = 3
-CAMERA_COM_NR = 11
+CAMERA_CH1_BIT = 0
+CAMERA_CH2_BIT = 1
+
+PERIOD_GEN_COM_NR = 3
+PULSE_GEN_COM_NR = 7
+CAMERA_COM_NR = 8
 
 #[ms]
 GENERATOR_PERIOD = 1
@@ -30,25 +34,27 @@ SAMPLES_NR = sum(PULSES_LIST[-1])
 
 PULSES_STRING = '\n'.join(np.array(PULSES_LIST).flatten().astype(str))
 
-print(PULSES_LIST)
-print(PULSES_STRING)
+# print(PULSES_LIST)
+# print(PULSES_STRING)
 
 with my_serial(PERIOD_GEN_COM_NR) as sr_period_gen:
     with my_serial(CAMERA_COM_NR) as sr_camera:           
         with my_serial(PULSE_GEN_COM_NR) as sr_pulse_gen:
-            read(sr_period_gen)            
-            read(sr_camera) 
-            read(sr_pulse_gen)
+            print("sr_period_gen:"+read(sr_period_gen))            
+            print("sr_camera:"+read(sr_camera)) 
+            print("sr_pulse_gen:"+read(sr_pulse_gen))            
             
-            writeln(sr_period_gen, str(GENERATOR_PERIOD))
             writeln(sr_pulse_gen, PULSES_STRING)
-            writeln(sr_camera, "Start")
-                
-            # samples_received = np.array([read_byte(sr_camera) for i in range(SAMPLES_NR)])
+                        
+            print("sr_camera:"+read(sr_camera)) 
+            print("sr_pulse_gen:"+read(sr_pulse_gen))
+            writeln(sr_period_gen, str(GENERATOR_PERIOD))
+            print("sr_period_gen:"+read(sr_period_gen))
+            
             samples_received=[]
             for i in range(SAMPLES_NR):
                 byte_buff = int(read_byte(sr_camera))
-                samples_received.append([byte_buff&0b1, byte_buff>>1&0b1])
+                samples_received.append([(byte_buff>>CAMERA_CH1_BIT)&1, (byte_buff>>CAMERA_CH2_BIT)&1])
             samples_received = np.array(samples_received)
 
 samples_received = samples_received.astype(int) #konwertuje stringi na inty
@@ -59,7 +65,7 @@ for start, width in PULSES_LIST:
 
 Error = samples_received[:,0] - samples_expected
 
-print(tabulate(zip(samples_received, samples_expected, Error), headers=['samples_received', 'samples_expected', 'Error']))
+# print(tabulate(zip(samples_received, samples_expected, Error), headers=['samples_received', 'samples_expected', 'Error']))
 
 shutil.rmtree('Results', ignore_errors=True)
 os.mkdir('Results')

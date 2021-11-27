@@ -9,21 +9,9 @@
 //
 //Testy dzialaja tylko na Uno, bo resetuje sie przy otwieraniu portu
 
-#define SR_SYNC 1
-
-#define WAIT_TO_START_PIN 11
-#define STARTED_PIN 13
 #define SIGNAL_CH2_PIN 4
 #define SIGNAL_CH1_PIN 3
 #define SAMPLE_PIN 2
-
-void StartupSynchronization(){
-  pinMode(WAIT_TO_START_PIN, INPUT_PULLUP);
-  pinMode(STARTED_PIN, INPUT_PULLUP);
-  while(digitalRead(WAIT_TO_START_PIN)){}
-  pinMode(STARTED_PIN, OUTPUT);
-  digitalWrite(STARTED_PIN, 0);
-}
 
 void OnChange_Sample(){
   byte read_bit_ch1 = digitalRead(SIGNAL_CH1_PIN);
@@ -38,15 +26,11 @@ void setup() {
     
   Serial.begin(115200);
   Serial.setTimeout(-1);
-  Serial.println("Init");
-  if(!SR_SYNC){
-    Serial.readStringUntil('\n');
-    StartupSynchronization();
-  }
+  Serial.println("COM opened");
+
   attachInterrupt(digitalPinToInterrupt(SAMPLE_PIN), OnChange_Sample, RISING);
-  if (SR_SYNC){
-    Serial.println("Started");
-  }
+  
+  Serial.println("Started");
 }
 
 void loop() {

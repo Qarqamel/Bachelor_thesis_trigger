@@ -10,23 +10,11 @@
 //Jeśli tak, to usuwa je z tablicy i zwraca informację przez UART.
 //#include <arduino-timer.h>
 
-#define SR_SYNC                   1
-
 #define MAX_TSTAMP_NR             10
 
-#define WAIT_TO_START_PIN         11
-#define STARTED_PIN               13
 #define SELECT_PULSE_PIN          5
 #define TIMEBASE_PIN              2
 #define TMSTMP_OVERFLOW_LED_PIN   7
-
-void StartupSynchronization(){
-  pinMode(WAIT_TO_START_PIN, INPUT_PULLUP);
-  pinMode(STARTED_PIN, INPUT_PULLUP);
-  while(digitalRead(WAIT_TO_START_PIN)){}
-  pinMode(STARTED_PIN, OUTPUT);
-  digitalWrite(STARTED_PIN, 0);
-}
 
 struct Timestamp{
   bool valid;
@@ -52,15 +40,11 @@ void setup() {
   
   Serial.begin(115200); 
   Serial.setTimeout(0);
-  Serial.println("Init");
-
-  if (!SR_SYNC){
-    StartupSynchronization();
-  }   
+  Serial.println("COM_opened");
+  
   attachInterrupt(digitalPinToInterrupt(TIMEBASE_PIN), OnChange_Timebase, RISING);
-  if (SR_SYNC){
-    Serial.println("Started");
-  }
+
+  Serial.println("Started");
 }
 
 

@@ -1,9 +1,10 @@
-from my_serial import my_serial,read,writeln,write
-import shutil, os, time, random, threading
+import shutil, os, time, random, threading, sys
 import pandas as pd
 from tabulate import tabulate
 from tqdm import tqdm
 from subprocess import call
+sys.path.append('../')
+from my_serial import my_serial,read,writeln
 
 TESTER_COM_NR = 13
 GENERATOR_COM_NR = 7
@@ -27,12 +28,13 @@ df = pd.DataFrame(columns=['Timestamps', 'Delays [ms]'])
 
 with my_serial(GENERATOR_COM_NR) as sr_generator:    
     with my_serial(TESTER_COM_NR) as sr_tester:        
-        read(sr_tester)     
-        read(sr_generator)
+        print("sr_tester:"+read(sr_tester))     
+        print("sr_generator"+read(sr_generator))
         
+        print("sr_tester:"+read(sr_tester))        
         writeln(sr_generator, '1')
-        writeln(sr_tester, 'Start')
-
+        print("sr_generator"+read(sr_generator))
+        
         for i in tqdm(range(PULSES_NR)):
             writeln(sr_tester, str(1<<SAMPLE_CH_NR))
             new_row = {'Timestamps':int(read(sr_tester)), 'Delays [ms]':int(read(sr_tester))}

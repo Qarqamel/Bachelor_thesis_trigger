@@ -10,18 +10,8 @@
 //Program na każdym zboczu rosnącym PWM-a wyjściowego zmienia wartość w rejestrze na kolejną wartość z tablicy okresów, a co za tym idzie okres przsebiegu wyjściowego.
 
 #define FEEDBACK_TIMEBASE_PIN 2
-#define WAIT_TO_START_PIN 11
-#define STARTED_PIN 13
 
 #define NR_OF_PERIODS 3
-
-void StartupSynchronization(){
-  pinMode(WAIT_TO_START_PIN, INPUT_PULLUP);
-  pinMode(STARTED_PIN, INPUT_PULLUP);
-  while(digitalRead(WAIT_TO_START_PIN)){}
-  pinMode(STARTED_PIN, OUTPUT);
-  digitalWrite(STARTED_PIN, 0);
-}
 
 void TimerConfig(unsigned int T_ms){
   DDRB |= (1<<PB2); //alternatively pinMode(10, OUT);(PB2 - Uno, PB6 Leonardo) - setting pin connected to sqr_wave_gen direction to output
@@ -51,16 +41,16 @@ void setup() {
   
   Serial.begin(115200);
   Serial.setTimeout(-1);
-  Serial.println("Waiting for periods");
+  Serial.println("COM opened;Waiting for periods");
 
   for(byte i = 0; i<NR_OF_PERIODS;i++){
     T_ms_tbl[i] = Serial.readStringUntil('\n').toInt();
   }
-
   TimerConfig(T_ms_tbl[0]);
-  StartupSynchronization();
   attachInterrupt(digitalPinToInterrupt(FEEDBACK_TIMEBASE_PIN), OnChange_FeedbackTimebase, RISING);
   TimerStart();
+
+  Serial.println("Started");
 }
 
 void loop() {}

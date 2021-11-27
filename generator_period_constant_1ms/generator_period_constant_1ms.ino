@@ -10,19 +10,6 @@
 //Przy użyciu 16-bitowego timera (timer1) pracującego w trybie non inverting fast PWM z prescalerem 64, generuje przebieg prostkątny. 
 //Okres przebiegu przyjmowany jest przez UART-a, następnie zwracany spowrotem i wpisywany do rejestru Output compare timera, w celu zmiany okresu przebiego.
 
-#define SR_SYNC 1
-
-#define WAIT_TO_START_PIN 11
-#define STARTED_PIN 13
-
-void StartupSynchronization(){
-  pinMode(WAIT_TO_START_PIN, INPUT_PULLUP);
-  pinMode(STARTED_PIN, INPUT_PULLUP);
-  while(digitalRead(WAIT_TO_START_PIN)){}
-  pinMode(STARTED_PIN, OUTPUT);
-  digitalWrite(STARTED_PIN, 0);
-}
-
 void TimerConfig(unsigned int T_ms){
   DDRB |= (1<<PB2); //alternatively pinMode(10, OUT);(PB2 - Uno, PB6 Leonardo) - setting pin connected to sqr_wave_gen direction to output
   TCCR1A |= (1<<WGM11)|(1<<WGM10); //WGM11|WGM10 - non inverting, fast PWM mode, TOP in OCR1A
@@ -41,17 +28,13 @@ void setup() {
   
   Serial.begin(115200);
   Serial.setTimeout(-1);
-  Serial.println("Waiting for period");
+  Serial.println("COM opened;Waiting for period");
+  
   unsigned int T_ms = Serial.readStringUntil('\n').toInt();
-
   TimerConfig(T_ms);
-  if(!SR_SYNC){
-    StartupSynchronization();
-  }
   TimerStart();
-  if (SR_SYNC){
-    Serial.println("Started");
-  }
+  
+  Serial.println("Started;Send period to adj");
 }
 
 void loop() {

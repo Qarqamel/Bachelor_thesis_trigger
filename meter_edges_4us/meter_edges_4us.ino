@@ -12,18 +12,8 @@
 
 #define TSTAMP_NR           10
 
-#define WAIT_TO_START_PIN   11
-#define STARTED_PIN         13
 #define TIMEBASE_PIN        2
 #define EDGE_PIN            3
-
-void StartupSynchronization(){
-  pinMode(WAIT_TO_START_PIN, INPUT_PULLUP);
-  pinMode(STARTED_PIN, INPUT_PULLUP);
-  while(digitalRead(WAIT_TO_START_PIN)){}
-  pinMode(STARTED_PIN, OUTPUT);
-  digitalWrite(STARTED_PIN, 0);
-}
 
 volatile unsigned long time_base_ctr = 0;
 volatile unsigned long Pulses_times[TSTAMP_NR];
@@ -46,13 +36,13 @@ void setup(){
 
   Serial.begin(115200);
   Serial.setTimeout(-1);
-  Serial.println("Started");
-  Serial.readStringUntil('\n');
+  Serial.println("COM opened");
 
-  StartupSynchronization();
   attachInterrupt(digitalPinToInterrupt(TIMEBASE_PIN), OnChange_Timebase, RISING);
   attachInterrupt(digitalPinToInterrupt(EDGE_PIN), OnChange_Edge, RISING);
 
+  Serial.println("Started");
+  
   while(!acquisition_complete){}
   for(byte i = 0; i<TSTAMP_NR; i++){
     Serial.println(Pulses_times[i]);

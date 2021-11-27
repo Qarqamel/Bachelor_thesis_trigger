@@ -14,18 +14,6 @@
 //względem aktualnego okresu wejściowego.
 
 #define TIMEBASE_PIN 2
-#define WAIT_TO_START_1_PIN 11
-#define WAIT_TO_START_2_PIN 12
-#define STARTED_PIN 13
-
-void StartupSynchronization(){
-  pinMode(WAIT_TO_START_1_PIN, INPUT_PULLUP);
-  pinMode(WAIT_TO_START_2_PIN, INPUT_PULLUP);
-  pinMode(STARTED_PIN, INPUT_PULLUP);
-  while(digitalRead(WAIT_TO_START_1_PIN)||digitalRead(WAIT_TO_START_2_PIN)){}
-  pinMode(STARTED_PIN, OUTPUT);
-  digitalWrite(STARTED_PIN, 0);
-}
 
 void TimerConfig(){
   DDRB |= (1<<PB2); //alternatively pinMode(10, OUT);(PB2 - Uno, PB6 Leonardo) - setting pin connected to sqr_wave_gen direction to output
@@ -68,12 +56,13 @@ void setup() {
   
   Serial.begin(115200);
   Serial.setTimeout(-1);
-  Serial.println("Started");
+  Serial.println("COM opened");
     
   TimerConfig();
-  StartupSynchronization();
   attachInterrupt(digitalPinToInterrupt(TIMEBASE_PIN), OnChange_Timebase, RISING);
   TimerStart();
+
+  Serial.println("Started;Send period to callib");
 }
 
 void loop() {  

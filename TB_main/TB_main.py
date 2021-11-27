@@ -1,13 +1,17 @@
-from my_serial import my_serial,read,read_byte,writeln
-import shutil, os, random, threading
+import shutil, os, random, threading, sys
 from subprocess import call
 from matplotlib import pyplot as plt
 import numpy as np
 from tabulate import tabulate
 from tqdm import tqdm
+sys.path.append('../')
+from my_serial import my_serial,read,read_byte,writeln
 
 def Signal_processing_task():
-    call(['python', 'Image_processing.py'])
+    call(['python', '..\Image_processing.py'])
+
+CAMERA_CH1_BIT = 0
+CAMERA_CH2_BIT = 1
 
 PERIOD_GEN_COM_NR = 3
 PULSE_GEN_COM_NR = 7
@@ -38,8 +42,9 @@ SAMPLES_NR = recent_pulse_end
 
 PULSES_STRING = '\n'.join(np.array(PULSES_LIST).flatten().astype(str))
 
-print(PULSES_LIST)
-print(PULSES_STRING)
+# print(PULSES_LIST)
+# print(PULSES_STRING)
+
 with my_serial(SIG_PROC_COM_NR) as sr_sig_proc:
     with my_serial(PERIOD_GEN_COM_NR) as sr_period_gen:
         with my_serial(CAMERA_COM_NR) as sr_camera:           
@@ -47,7 +52,7 @@ with my_serial(SIG_PROC_COM_NR) as sr_sig_proc:
                 Signal_processing_thread =threading.Thread(target=Signal_processing_task)
                 Signal_processing_thread.start()
                 print("sr_period_gen:"+read(sr_period_gen))           
-                print("sr_camera:"+read(sr_camera)) 
+                print("sr_camera:"+read(sr_camera).lstrip('0')) 
                 print("sr_pulse_gen:"+read(sr_pulse_gen))
                 print("sr_sig_proc:"+read(sr_sig_proc))                
                 
@@ -60,9 +65,10 @@ with my_serial(SIG_PROC_COM_NR) as sr_sig_proc:
                 print("sr_period_gen:"+read(sr_period_gen))
                 
                 samples_received=[]
-                for i in tqdm(range(SAMPLES_NR)):
+                for i in range(SAMPLES_NR):
                     byte_buff = int(read_byte(sr_camera))
-                    samples_received.append([byte_buff&0b1, byte_buff>>1&0b1])
+                    samples_received.append([(byte_buff>>CAMERA_CH1_BIT)&1, (byte_buff>>CAMERA_CH2_BIT)&1])
+                print('All samples received')
                              
 Signal_processing_thread.join()
 
@@ -75,15 +81,15 @@ for start, width in PULSES_LIST:
     samples_expected_ch1[start:start+SELECTOR_PULSE_WIDTH] = True
     samples_expected_ch2[start:start+width] = True    
 
-print(tabulate(zip(samples_received, samples_expected_ch2), headers=['samples_received', 'samples_expected']))
+#print(tabulate(zip(samples_received, samples_expected_ch2), headers=['samples_received', 'samples_expected']))
 
 shutil.rmtree('Results', ignore_errors=True)
 os.mkdir('Results')
 
 fig, axs = plt.subplots(4)
 axs[0].plot(samples_received[:,0], label='Measured Samples ch1')
-axs[1].plot(samples_expected_ch1,'green', label='Computed Samples Ch1')
-axs[2].plot(samples_received[:,1], label='Measured Samples ch2')
-axs[3].plot(samples_expected_ch2,'green', label='Computed Samples Ch2')
+axs[1].plot(samples_expected_ch1,'green', label='Computed Samples ch1')
+axs[2].plot(samples_received[:,1],'orange', label='Measured Samples ch2')
+axs[3].plot(samples_expected_ch2,'red', label='Computed Samples ch2')
 fig.legend()
 fig.savefig('Results/results', dpi = 250)
