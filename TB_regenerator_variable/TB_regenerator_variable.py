@@ -1,15 +1,15 @@
 SAMPLE_NR = 2900
 METER_UNIT_IN_US = 0.0625
 
-METER_COM_NR = 13
-REGENERATOR_COM_NR = 6
-GENERATOR_COM_NR = 36
+METER_COM_NR = 47
+REGENERATOR_COM_NR = 36
+GENERATOR_COM_NR = 6
 
 GENERATOR_PERIODS_LIST = [4,10,40]
 
 
 from tabulate import tabulate
-import shutil, os, sys
+import shutil, os, sys, pickle
 import pandas as pd
 sys.path.append('../')
 from my_serial import my_serial,read,writeln
@@ -44,3 +44,5 @@ os.mkdir('Results')
 
 with open("Results/results.txt", 'w') as f:
     f.write(result)
+with open("Results/results", "wb") as f:
+    pickle.dump(result, f)
