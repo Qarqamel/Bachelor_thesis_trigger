@@ -3,13 +3,13 @@ METER_UNIT_IN_US = 0.0625
 SetPeriodIn_ms_l = [1, 2, 5, 10]
 SetPeriodOut_us_l = [40, 1000, 100, 200]
 
-GENERATOR_COM_NR = 36
-REGENERATOR_COM_NR = 6
-METER_COM_NR = 13
+GENERATOR_COM_NR = 6
+REGENERATOR_COM_NR = 36
+METER_COM_NR = 47
 
 
 from tabulate import tabulate
-import shutil, os, sys
+import shutil, os, sys, pickle
 import pandas as pd
 sys.path.append('../')
 from my_serial import my_serial,read,writeln
@@ -48,3 +48,5 @@ with my_serial(GENERATOR_COM_NR) as sr_generator:
                 print(result)                
                 with open(f"Results/in={period_In}ms;out={period_Out}us.txt", 'w') as f:
                     f.write(result)
+                with open(f"Results/in={period_In}ms;out={period_Out}us", "wb") as f:
+                    pickle.dump(result, f)
