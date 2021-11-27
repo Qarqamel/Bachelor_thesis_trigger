@@ -16,23 +16,25 @@ SIG_PROC_COM_NR = 5
 
 #[ms]
 GENERATOR_PERIOD = 1
+SELECTOR_PULSE_WIDTH = 10
 
 PULSES_NR = 10
 
 #[ms]
 FIRST_PULSE = 10
-PULSE_WIDTH = 10
-PULSE_MIN_PER = 10
-PULSE_MAX_PER = 100
+PULSE_MIN_WIDTH = 50
+PULSE_MAX_WIDTH = 70
+PULSE_MIN_PER = 100
+PULSE_MAX_PER = 150
 
 PULSES_LIST = []
 recent_pulse_end = FIRST_PULSE
 for i in range(PULSES_NR):
     pulse_start = recent_pulse_end + random.randrange(PULSE_MIN_PER, PULSE_MAX_PER, 1)
-    pulse_width = PULSE_WIDTH
+    pulse_width = random.randrange(PULSE_MIN_WIDTH, PULSE_MAX_WIDTH, 1)
     PULSES_LIST.append([pulse_start, pulse_width])
     recent_pulse_end = pulse_start+pulse_width
-SAMPLES_NR = sum(PULSES_LIST[-1])
+SAMPLES_NR = recent_pulse_end
 
 PULSES_STRING = '\n'.join(np.array(PULSES_LIST).flatten().astype(str))
 
@@ -67,19 +69,21 @@ Signal_processing_thread.join()
 samples_received = np.array(samples_received)
 samples_received = samples_received.astype(int) #konwertuje stringi na inty
 
-samples_expected = np.zeros(SAMPLES_NR, dtype=bool)
+samples_expected_ch1 = np.zeros(SAMPLES_NR, dtype=bool)    
+samples_expected_ch2 = np.zeros(SAMPLES_NR, dtype=bool)
 for start, width in PULSES_LIST:
-    samples_expected[start:start+width] = True
+    samples_expected_ch1[start:start+SELECTOR_PULSE_WIDTH] = True
+    samples_expected_ch2[start:start+width] = True    
 
-print(tabulate(zip(samples_received, samples_expected), headers=['samples_received', 'samples_expected']))
+print(tabulate(zip(samples_received, samples_expected_ch2), headers=['samples_received', 'samples_expected']))
 
 shutil.rmtree('Results', ignore_errors=True)
 os.mkdir('Results')
 
-fig, axs = plt.subplots(3)
+fig, axs = plt.subplots(4)
 axs[0].plot(samples_received[:,0], label='Measured Samples ch1')
-axs[1].plot(samples_received[:,1], label='Measured Samples ch2')
-axs[2].plot(samples_expected,'orange', label='Computed Samples')
-# axs[2].plot(Error, 'r', label = 'Error')
+axs[1].plot(samples_expected_ch1,'green', label='Computed Samples Ch1')
+axs[2].plot(samples_received[:,1], label='Measured Samples ch2')
+axs[3].plot(samples_expected_ch2,'green', label='Computed Samples Ch2')
 fig.legend()
 fig.savefig('Results/results', dpi = 250)
