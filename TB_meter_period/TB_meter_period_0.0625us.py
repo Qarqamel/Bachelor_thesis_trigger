@@ -2,7 +2,7 @@ SAMPLE_NR = 2900
 METER_UNIT_IN_US = 0.0625
 PERIOD_INPUT_US = 25
 
-METER_COM_NR = 15
+METER_COM_NR = 12
 
 from tabulate import tabulate
 import shutil, os, sys, pickle
