@@ -43,4 +43,4 @@ os.mkdir('Results')
 with open("Results/results.txt", 'w') as f:
     f.write(result)
 with open("Results/results", "wb") as f:
-    pickle.dump(result, f)
+    pickle.dump(df, f)

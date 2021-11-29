@@ -67,4 +67,5 @@ void setup() {
 void loop() {  
   T_out = Serial.readStringUntil('\n').toInt();
   callib = true;
+  Serial.println("Callibrated; Send period to callib");
 }

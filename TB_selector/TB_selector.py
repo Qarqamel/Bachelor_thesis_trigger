@@ -1,5 +1,5 @@
 from tabulate import tabulate
-import random, shutil, os, sys
+import random, shutil, os, sys, pickle
 import pandas as pd
 sys.path.append('../')
 from my_serial import my_serial,read,writeln
@@ -11,7 +11,7 @@ TIMESTAMPS_STEP  = 50   # in trigers (50ms)
 
 GENERATOR_COM_NR = 3
 SELECTOR_COM_NR = 11
-METER_COM_NR = 19
+METER_COM_NR = 7
 
 TimestampsToSend_ms = [FIRST_TIMESTAMP]
 recent_timestamp = FIRST_TIMESTAMP
@@ -21,12 +21,13 @@ for i in range(TIMESTAMPS_NR-1):
     recent_timestamp = timestamp
 
 with my_serial(GENERATOR_COM_NR) as sr_generator:
-    with my_serial(SELECTOR_COM_NR) as sr_selector:        
+    with my_serial(SELECTOR_COM_NR) as sr_selector:
+        print("sr_selector:"+read(sr_selector))                
         with my_serial(METER_COM_NR) as sr_meter:
             print("sr_generator:"+read(sr_generator))
             
-            print("sr_meter:"+read(sr_meter))
-            print("sr_selector:"+read(sr_selector))
+            
+            print("sr_meter:"+read(sr_meter))            
             writeln(sr_generator, '1');
             print("sr_generator:"+read(sr_generator))
             
@@ -46,3 +47,5 @@ shutil.rmtree('Results', ignore_errors=True)
 os.mkdir('Results')
 with open('Results/results.txt', 'w') as file:
     file.write(result)
+with open("Results/results", "wb") as f:
+    pickle.dump(df, f)

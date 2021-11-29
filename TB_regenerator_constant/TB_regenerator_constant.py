@@ -24,13 +24,13 @@ with my_serial(GENERATOR_COM_NR) as sr_generator:
                         
             print("sr_regenerator:"+read(sr_regenerator))
             print("sr_meter:"+read(sr_meter))
-            writeln(sr_generator, '1')
-            print("sr_generator:"+read(sr_generator))
 
             for period_In, period_Out in zip(SetPeriodIn_ms_l, SetPeriodOut_us_l):
             
                 writeln(sr_generator, str(period_In))
+                print("sr_generator:"+read(sr_generator))
                 writeln(sr_regenerator, str(period_Out))
+                print("sr_regenerator:"+read(sr_regenerator))
                 writeln(sr_meter, 'start')
                 
                 df = pd.DataFrame()
@@ -47,4 +47,4 @@ with my_serial(GENERATOR_COM_NR) as sr_generator:
                 with open(f"Results/in={period_In}ms;out={period_Out}us.txt", 'w') as f:
                     f.write(result)
                 with open(f"Results/in={period_In}ms;out={period_Out}us", "wb") as f:
-                    pickle.dump(result, f)
+                    pickle.dump(df, f)

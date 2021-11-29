@@ -3,7 +3,7 @@ from my_serial import my_serial,read_byte,writeln,read
 SAMPLE_CH_NR = 0
 STOP_CH_NR = 1
 
-INPUT_SAMPLES_COM_NR = 8
+INPUT_SAMPLES_COM_NR = 19
 OUTPUT_TIMESTAMPS_COM_NR = 11
 TB_MAIN_COM_NR = 6
 

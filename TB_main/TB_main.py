@@ -1,9 +1,10 @@
-import shutil, os, random, threading, sys
+import shutil, os, random, threading, sys, pickle
 from subprocess import call
 from matplotlib import pyplot as plt
 import numpy as np
 from tabulate import tabulate
 from tqdm import tqdm
+import pandas as pd
 sys.path.append('../')
 from my_serial import my_serial,read,read_byte,writeln
 
@@ -14,8 +15,8 @@ CAMERA_CH1_BIT = 0
 CAMERA_CH2_BIT = 1
 
 PERIOD_GEN_COM_NR = 3
-PULSE_GEN_COM_NR = 7
-CAMERA_COM_NR = 19
+PULSE_GEN_COM_NR = 8
+CAMERA_COM_NR = 7
 SIG_PROC_COM_NR = 5
 
 #[ms]
@@ -79,7 +80,13 @@ for start, width in PULSES_LIST:
     samples_expected_ch1[start:start+SELECTOR_PULSE_WIDTH] = True
     samples_expected_ch2[start:start+width] = True    
 
-#print(tabulate(zip(samples_received, samples_expected_ch2), headers=['samples_received', 'samples_expected']))
+df = pd.DataFrame()
+df['Received samples ch1'] = samples_received[:,0]
+df['Received samples ch2'] = samples_received[:,1]
+df['Expected samples ch1'] = samples_expected_ch1
+df['Expected samples ch2'] = samples_expected_ch2
+
+print(tabulate(df,df.columns))
 
 shutil.rmtree('Results', ignore_errors=True)
 os.mkdir('Results')
@@ -91,3 +98,6 @@ axs[2].plot(samples_received[:,1],'orange', label='Measured Samples ch2')
 axs[3].plot(samples_expected_ch2,'red', label='Computed Samples ch2')
 fig.legend()
 fig.savefig('Results/results', dpi = 250)
+
+with open("Results/results", "wb") as f:
+    pickle.dump(df, f)

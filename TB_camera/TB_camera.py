@@ -1,7 +1,8 @@
-import shutil, os, random, sys
+import shutil, os, random, sys, pickle
 from matplotlib import pyplot as plt
 import numpy as np
 from tabulate import tabulate
+import pandas as pd
 sys.path.append('../')
 from my_serial import my_serial,read,read_byte,writeln
 
@@ -9,8 +10,8 @@ CAMERA_CH1_BIT = 0
 CAMERA_CH2_BIT = 1
 
 PERIOD_GEN_COM_NR = 3
-PULSE_GEN_COM_NR = 7
-CAMERA_COM_NR = 8
+PULSE_GEN_COM_NR = 8
+CAMERA_COM_NR = 19
 
 #[ms]
 GENERATOR_PERIOD = 1
@@ -54,24 +55,31 @@ with my_serial(PERIOD_GEN_COM_NR) as sr_period_gen:
             for i in range(SAMPLES_NR):
                 byte_buff = int(read_byte(sr_camera))
                 samples_received.append([(byte_buff>>CAMERA_CH1_BIT)&1, (byte_buff>>CAMERA_CH2_BIT)&1])
-            samples_received = np.array(samples_received)
 
+samples_received = np.array(samples_received)
 samples_received = samples_received.astype(int) #konwertuje stringi na inty
 
 samples_expected = np.zeros(SAMPLES_NR, dtype=bool)
 for start, width in PULSES_LIST:
     samples_expected[start:start+width] = True
-
 Error = samples_received[:,0] - samples_expected
 
-# print(tabulate(zip(samples_received, samples_expected, Error), headers=['samples_received', 'samples_expected', 'Error']))
+df = pd.DataFrame()
+df['Received samples'] = samples_received[:,0]
+df['Expected sampels'] = samples_expected
+df['Error'] = Error
+
+print(tabulate(df, df.columns))
 
 shutil.rmtree('Results', ignore_errors=True)
 os.mkdir('Results')
 
 fig, axs = plt.subplots(3)
-axs[0].plot(samples_received[:,0], label='Measured Samples')
-axs[1].plot(samples_expected,'orange', label='Computed Samples')
+axs[0].plot(samples_received[:,0], label='Received Samples')
+axs[1].plot(samples_expected,'orange', label='Expected Samples')
 axs[2].plot(Error, 'r', label = 'Error')
 fig.legend()
 fig.savefig('Results/results', dpi = 250)
+
+with open("Results/results", "wb") as f:
+    pickle.dump(df, f)
