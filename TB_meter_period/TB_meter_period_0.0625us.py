@@ -13,7 +13,6 @@ from my_serial import my_serial,read,writeln
 
 with my_serial(METER_COM_NR) as sr_meter:
     print("sr_meter:"+read(sr_meter))
-    print("sr_meter:"+read(sr_meter))
     
     writeln(sr_meter, 'start')
     
