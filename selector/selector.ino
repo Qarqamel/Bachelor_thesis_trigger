@@ -40,7 +40,6 @@ void setup() {
   
   Serial.begin(115200); 
   Serial.setTimeout(0);
-  Serial.println("COM_opened");
   
   attachInterrupt(digitalPinToInterrupt(TIMEBASE_PIN), OnChange_Timebase, RISING);
 

@@ -26,7 +26,6 @@ void setup() {
     
   Serial.begin(115200);
   Serial.setTimeout(-1);
-  Serial.println("COM opened");
 
   attachInterrupt(digitalPinToInterrupt(SAMPLE_PIN), OnChange_Sample, RISING);
   
