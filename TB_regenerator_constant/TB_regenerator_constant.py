@@ -4,8 +4,8 @@ SetPeriodIn_ms_l = [1, 2, 5, 10]
 SetPeriodOut_us_l = [40, 1000, 100, 200]
 
 GENERATOR_COM_NR = 6
-REGENERATOR_COM_NR = 36
-METER_COM_NR = 47
+REGENERATOR_COM_NR = 16
+METER_COM_NR = 12
 
 
 from tabulate import tabulate
