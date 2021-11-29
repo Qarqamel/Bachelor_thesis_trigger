@@ -23,8 +23,6 @@ for i in range(TIMESTAMPS_NR-1):
 with my_serial(GENERATOR_COM_NR) as sr_generator:
     with my_serial(SELECTOR_COM_NR) as sr_selector:        
         with my_serial(METER_COM_NR) as sr_meter:
-            print("sr_meter:"+read(sr_meter))
-            print("sr_selector:"+read(sr_selector))
             print("sr_generator:"+read(sr_generator))
             
             print("sr_meter:"+read(sr_meter))

@@ -12,9 +12,6 @@ sample_ctr = 0
 with my_serial(TB_MAIN_COM_NR) as sr_tb:
     with my_serial(INPUT_SAMPLES_COM_NR) as sr_input:
         with  my_serial(OUTPUT_TIMESTAMPS_COM_NR) as sr_output:
-            writeln(sr_tb, "COM opened")
-            print("img_proc_input:"+read(sr_input))
-            print("img_proc_output:"+read(sr_output))
             print("img_proc_input:"+read(sr_input))
             print("img_proc_output:"+read(sr_output))
             

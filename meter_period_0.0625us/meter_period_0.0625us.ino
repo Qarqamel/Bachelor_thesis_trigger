@@ -53,7 +53,6 @@ void setup() {
   
   Serial.begin(115200);
   Serial.setTimeout(-1);
-  Serial.println("COM opened");
 
   TimerConfig();
   Serial.println("Started;Waiting for acq");

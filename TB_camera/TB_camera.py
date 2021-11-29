@@ -40,13 +40,12 @@ PULSES_STRING = '\n'.join(np.array(PULSES_LIST).flatten().astype(str))
 with my_serial(PERIOD_GEN_COM_NR) as sr_period_gen:
     with my_serial(CAMERA_COM_NR) as sr_camera:           
         with my_serial(PULSE_GEN_COM_NR) as sr_pulse_gen:
-            print("sr_period_gen:"+read(sr_period_gen))            
-            print("sr_camera:"+read(sr_camera)) 
+            print("sr_period_gen:"+read(sr_period_gen)) 
             print("sr_pulse_gen:"+read(sr_pulse_gen))            
             
             writeln(sr_pulse_gen, PULSES_STRING)
                         
-            print("sr_camera:"+read(sr_camera)) 
+            print("sr_camera:"+read(sr_camera).lstrip('0')) 
             print("sr_pulse_gen:"+read(sr_pulse_gen))
             writeln(sr_period_gen, str(GENERATOR_PERIOD))
             print("sr_period_gen:"+read(sr_period_gen))

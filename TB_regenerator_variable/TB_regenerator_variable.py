@@ -17,8 +17,6 @@ from my_serial import my_serial,read,writeln
 with my_serial(METER_COM_NR) as sr_meter:
     with my_serial(REGENERATOR_COM_NR) as sr_regenerator:
         with my_serial(GENERATOR_COM_NR) as sr_generator:
-            print("sr_meter:"+read(sr_meter))
-            print("sr_regenerator:"+read(sr_regenerator))
             print("sr_generator:"+read(sr_generator))
                 
             print("sr_meter:"+read(sr_meter))
