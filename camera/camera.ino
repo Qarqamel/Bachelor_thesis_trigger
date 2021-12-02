@@ -9,19 +9,19 @@
 //
 //Testy dzialaja tylko na Uno, bo resetuje sie przy otwieraniu portu
 
-#define SIGNAL_CH2_PIN 4
-#define SIGNAL_CH1_PIN 3
+#define SIGNAL_CH1_PIN 4
+#define SIGNAL_CH0_PIN 3
 #define SAMPLE_PIN 2
 
 void OnChange_Sample(){
-  byte read_bit_ch1 = digitalRead(SIGNAL_CH1_PIN);
-  byte read_bit_ch2 = digitalRead(SIGNAL_CH2_PIN);
+  byte read_bit_ch1 = digitalRead(SIGNAL_CH0_PIN);
+  byte read_bit_ch2 = digitalRead(SIGNAL_CH1_PIN);
   Serial.print((read_bit_ch2<<1)|read_bit_ch1);
 }
 
 void setup() {
+  pinMode(SIGNAL_CH0_PIN, INPUT_PULLUP);
   pinMode(SIGNAL_CH1_PIN, INPUT_PULLUP);
-  pinMode(SIGNAL_CH2_PIN, INPUT_PULLUP);
   pinMode(SAMPLE_PIN, INPUT_PULLUP);
     
   Serial.begin(115200);

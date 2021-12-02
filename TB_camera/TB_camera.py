@@ -6,8 +6,8 @@ import pandas as pd
 sys.path.append('../')
 from my_serial import my_serial,read,read_byte,writeln
 
-CAMERA_CH1_BIT = 0
-CAMERA_CH2_BIT = 1
+CAMERA_CH0_BIT = 0
+CAMERA_CH1_BIT = 1
 
 PERIOD_GEN_COM_NR = 3
 PULSE_GEN_COM_NR = 8
@@ -54,7 +54,7 @@ with my_serial(PERIOD_GEN_COM_NR) as sr_period_gen:
             samples_received=[]
             for i in range(SAMPLES_NR):
                 byte_buff = int(read_byte(sr_camera))
-                samples_received.append([(byte_buff>>CAMERA_CH1_BIT)&1, (byte_buff>>CAMERA_CH2_BIT)&1])
+                samples_received.append([(byte_buff>>CAMERA_CH0_BIT)&1, (byte_buff>>CAMERA_CH1_BIT)&1])
 
 samples_received = np.array(samples_received)
 samples_received = samples_received.astype(int) #konwertuje stringi na inty
