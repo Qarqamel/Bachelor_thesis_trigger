@@ -24,8 +24,6 @@ with  my_serial(OUTPUT_TIMESTAMPS_COM_NR) as sr_output:
             
             while True:
                 rcvd_byte = int(read_byte(sr_input))&((1<<SAMPLE_CH_NR)|(1<<STOP_CH_NR))
-                if(rcvd_byte>0):
-                    print(rcvd_byte)
                 curr_sample = rcvd_byte&(1<<SAMPLE_CH_NR)
                 stop_bit = rcvd_byte&(1<<STOP_CH_NR)
                 if(last_sample == 0 and curr_sample == 1):

@@ -7,8 +7,6 @@
 #define Img_proc_sr Serial
 #define TB_sr Serial1
 
-#define PULSES_NR_PER_ACQ 100
-
 volatile unsigned long Sample_ctr = 0;
 volatile unsigned long Sample_ctr_buff = 0;
 volatile byte sample_val = 0;
@@ -32,13 +30,14 @@ void setup() {
   pinMode(TIMEBASE_PIN, INPUT_PULLUP);
   pinMode(WAIT_FOR_PULSE_PIN, INPUT_PULLUP);
 
-  TB_sr.begin(115200);
-  TB_sr.setTimeout(-1);
   Img_proc_sr.begin(115200);
   Img_proc_sr.setTimeout(-1);
-  
+  TB_sr.begin(115200);
+  TB_sr.setTimeout(-1);
+
   attachInterrupt(digitalPinToInterrupt(TIMEBASE_PIN), OnChange_Timebase, RISING);
   attachInterrupt(digitalPinToInterrupt(WAIT_FOR_PULSE_PIN), OnChange_WaitForPulse, RISING);
+  
   Img_proc_sr.println("Started");
 }
 

@@ -62,17 +62,17 @@ Signal_processing_thread.join()
 samples_received = np.array(samples_received)
 samples_received = samples_received.astype(int) #konwertuje stringi na inty
 
-samples_expected_ch1 = np.zeros(SAMPLES_NR, dtype=bool)    
-samples_expected_ch2 = np.zeros(SAMPLES_NR, dtype=bool)
+samples_expected_ch0 = np.zeros(SAMPLES_NR, dtype=bool)    
+samples_expected_ch1 = np.zeros(SAMPLES_NR, dtype=bool)
 for start, width in PULSES_LIST:
-    samples_expected_ch1[start:start+SELECTOR_PULSE_WIDTH] = True
-    samples_expected_ch2[start:start+width] = True    
+    samples_expected_ch0[start:start+SELECTOR_PULSE_WIDTH] = True
+    samples_expected_ch1[start:start+width] = True    
 
 df = pd.DataFrame()
-df['Received samples ch1'] = samples_received[:,0]
-df['Received samples ch2'] = samples_received[:,1]
+df['Received samples ch0'] = samples_received[:,0]
+df['Received samples ch1'] = samples_received[:,1]
+df['Expected samples ch0'] = samples_expected_ch0
 df['Expected samples ch1'] = samples_expected_ch1
-df['Expected samples ch2'] = samples_expected_ch2
 
 print(tabulate(df,df.columns))
 
@@ -80,10 +80,10 @@ shutil.rmtree('Results', ignore_errors=True)
 os.mkdir('Results')
 
 fig, axs = plt.subplots(4)
-axs[0].plot(samples_received[:,0], label='Measured Samples ch1')
-axs[1].plot(samples_expected_ch1,'green', label='Computed Samples ch1')
-axs[2].plot(samples_received[:,1],'orange', label='Measured Samples ch2')
-axs[3].plot(samples_expected_ch2,'red', label='Computed Samples ch2')
+axs[0].plot(samples_received[:,0], label='Measured Samples ch0')
+axs[1].plot(samples_expected_ch0,'green', label='Computed Samples ch0')
+axs[2].plot(samples_received[:,1],'orange', label='Measured Samples ch1')
+axs[3].plot(samples_expected_ch1,'red', label='Computed Samples ch1')
 fig.legend()
 fig.savefig('Results/results', dpi = 250)
 
