@@ -6,11 +6,22 @@ import pandas as pd
 sys.path.append('../')
 from my_serial import my_serial,read,read_byte,writeln
 
+def Find_Edges(samples_list):
+    edges_ind_list = []
+    last_samp = 1
+    for n, s in enumerate(samples_list):
+        if(last_samp == 0 and s == 1):
+            edges_ind_list.append(n)
+        last_samp = s
+    return edges_ind_list
+
 Lock_IP_Ready = threading.Lock()
 Lock_IP_Ready.acquire()
 
 Lock_IP_Start = threading.Lock()
 Lock_IP_Start.acquire()
+
+IP_DELAY = 200
 
 def TB_main():
     CAMERA_CH0_BIT = 0
@@ -39,7 +50,7 @@ def TB_main():
         pulse_width = random.randrange(PULSE_MIN_WIDTH, PULSE_MAX_WIDTH, 1)
         PULSES_LIST.append([pulse_start, pulse_width])
         recent_pulse_end = pulse_start+pulse_width
-    SAMPLES_NR = recent_pulse_end
+    SAMPLES_NR = recent_pulse_end + IP_DELAY
     PULSES_STRING = '\n'.join(np.array(PULSES_LIST).flatten().astype(str))
     
     with my_serial(CAMERA_COM_NR) as sr_camera:           
@@ -67,7 +78,7 @@ def TB_main():
     samples_expected_ch0 = np.zeros(SAMPLES_NR, dtype=bool)    
     samples_expected_ch1 = np.zeros(SAMPLES_NR, dtype=bool)
     for start, width in PULSES_LIST:
-        samples_expected_ch0[start:start+SELECTOR_PULSE_WIDTH] = True
+        samples_expected_ch0[start+IP_DELAY:start+IP_DELAY+SELECTOR_PULSE_WIDTH] = True
         samples_expected_ch1[start:start+width] = True    
     
     df = pd.DataFrame()
@@ -75,8 +86,14 @@ def TB_main():
     df['Received samples ch1'] = samples_received[:,1]
     df['Expected samples ch0'] = samples_expected_ch0
     df['Expected samples ch1'] = samples_expected_ch1
+            
+    ch0_edges_indx_lst = Find_Edges(df['Received samples ch0'])
+    ch1_edges_indx_lst = Find_Edges(df['Received samples ch1'])
     
-    # print(tabulate(df,df.columns))
+    Delays = [i-j for i, j in zip(ch0_edges_indx_lst, ch1_edges_indx_lst)]    
+    df = pd.concat([df, pd.DataFrame({'Delays':Delays})], axis=1)
+    result = tabulate(df,df.columns)
+    # print(result)
     
     shutil.rmtree('Results', ignore_errors=True)
     os.mkdir('Results')
@@ -88,6 +105,9 @@ def TB_main():
     axs[3].plot(samples_expected_ch1,'red', label='Computed Samples ch1')
     fig.legend()
     fig.savefig('Results/results', dpi = 250)
+    
+    with open("Results/results.txt", "w") as f:
+        f.write(result)
     
     with open("Results/results", "wb") as f:
         pickle.dump(df, f)
@@ -125,7 +145,7 @@ def Image_processing():
                     curr_sample = rcvd_byte&(1<<SAMPLE_CH_NR)
                     stop_bit = rcvd_byte&(1<<STOP_CH_NR)
                     if(last_sample == 0 and curr_sample == 1):
-                        writeln(sr_output, str(sample_ctr))
+                        writeln(sr_output, str(sample_ctr + IP_DELAY))
                     last_sample = curr_sample
                     sample_ctr += 1
                     if(stop_bit==(1<<STOP_CH_NR)):

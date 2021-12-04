@@ -52,7 +52,7 @@ def Image_processing():
     SAMPLE_CH_NR = 0
     STOP_CH_NR = 1
     
-    INPUT_SAMPLES_COM_NR = 25
+    INPUT_SAMPLES_COM_NR = 10
     OUTPUT_TIMESTAMPS_COM_NR = 8
     GENERATOR_COM_NR = 3
     
@@ -68,12 +68,12 @@ def Image_processing():
                 Lock_IP_Ready.release()
                 Lock_IP_Start.acquire()
                 print("IP: Started")
-                                
+                
                 last_sample = 1
                 stop_bit = 0
                 writeln(sr_generator, "1")
-                print("IP: sr_generator:"+read(sr_generator))
-                
+                print("IP: sr_generator:"+read(sr_generator))      
+                                
                 while True:
                     rcvd_byte = int(read_byte(sr_input))&((1<<SAMPLE_CH_NR)|(1<<STOP_CH_NR))
                     # print(rcvd_byte)
@@ -89,7 +89,8 @@ def Image_processing():
 IP_Thread = threading.Thread(target = Image_processing)
 TB_IP_Thread = threading.Thread(target = TB_image_processing)
 
-IP_Thread.start()
 TB_IP_Thread.start()
+time.sleep(2)
+IP_Thread.start()
 IP_Thread.join()
 TB_IP_Thread.join()
