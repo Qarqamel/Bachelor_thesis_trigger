@@ -21,7 +21,7 @@ Lock_IP_Ready.acquire()
 Lock_IP_Start = threading.Lock()
 Lock_IP_Start.acquire()
 
-IP_DELAY = 200
+IP_DELAY = 2000
 
 def TB_main():
     CAMERA_CH0_BIT = 0
